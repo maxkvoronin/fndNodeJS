@@ -7,9 +7,7 @@ module.exports.readCSV = (req, res, next) => {
   res.set('Content-Type', 'application/json');
 
   fs.createReadStream('./data/sample.csv')
-    .on('error', err => {
-      next(err);
-    })
+    .on('error', err => next(err))
     .pipe(split2())
     .pipe(transformToObj())
     .pipe(JSONStream.stringify())
