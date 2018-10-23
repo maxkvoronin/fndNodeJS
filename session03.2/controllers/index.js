@@ -39,6 +39,6 @@ const lineToJSON = () => {
     });
 
 
-    return cb(null, JSON.stringify(resultObj));
+    return cb(null, JSON.stringify(resultObj) + ',');
   });
 };
