@@ -1,6 +1,7 @@
 const fs = require('fs');
 const split2 = require('split2');
 const through2 = require('through2');
+const JSONStream = require('JSONStream');
 
 module.exports.readCSV = (req, res, next) => {
   res.set('Content-Type', 'application/json');
@@ -9,22 +10,17 @@ module.exports.readCSV = (req, res, next) => {
     .on('error', err => {
       next(err);
     })
-    .once('data', () => {
-      res.write('[');
-    })
     .pipe(split2())
-    .pipe(lineToJSON())
-    .on('end', () => {
-      res.write(']');
-    })
+    .pipe(transformToObj())
+    .pipe(JSONStream.stringify())
     .pipe(res)
   };
 
-const lineToJSON = () => {
+const transformToObj = () => {
   let isFirstLine = true;
   let keys = [];
 
-  return through2((line, enc, cb) => {
+  return through2.obj((line, enc, cb) => {
     if (isFirstLine) {
       keys = line.toString().split(',');
       isFirstLine = false;
@@ -38,7 +34,6 @@ const lineToJSON = () => {
       resultObj[key] = values[i];
     });
 
-
-    return cb(null, JSON.stringify(resultObj) + ',');
+    return cb(null, resultObj);
   });
 };
