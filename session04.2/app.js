@@ -1,6 +1,6 @@
-var express = require('express');
-var indexRouter = require('./routes/index');
-var app = express();
+const express = require('express');
+const indexRouter = require('./routes/index');
+const app = express();
 
 const collectStat = require('./middleware/collectStat.js');
 
