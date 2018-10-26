@@ -4,7 +4,7 @@ var app = express();
 
 const collectStat = require('./middleware/collectStat.js');
 
-app.use('/', indexRouter);
 app.use(collectStat);
+app.use('/', indexRouter);
 
 module.exports = app;
