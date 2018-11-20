@@ -45,12 +45,12 @@
     console.table(posts);
     posts.forEach(post => {
       feed.innerHTML += `<li class="rv b agz">
-          <img class="bos vb yb aff" src="${post.author_id.avatar}">
+          <img class="bos vb yb aff" src="${post.author[0].avatar}">
           <div class="rw">
           
             <div class="bpb">
               <small class="acx axc">${moment(post.publicationDate).format('YYYY-MM-DD HH:mm')}</small>
-              <h6>${post.author_id.name}</h6>
+              <h6>${post.author[0].name}</h6>
             </div>
             <p>${post.text}
             </p>` +
