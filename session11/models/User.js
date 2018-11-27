@@ -10,7 +10,6 @@ const userSchema = mongoose.Schema({
 }, { versionKey: false });
 
 userSchema.pre('save', function (next) {
-  //this._id = mongoose.Types.ObjectId();
   if (this.isModified('password') || this.isNew) {
     bcrypt.genSalt(10, (err, salt) => {
       if (err) {

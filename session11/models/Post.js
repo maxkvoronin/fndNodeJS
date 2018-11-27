@@ -10,4 +10,12 @@ const postSchema = mongoose.Schema({
   picture:         { type: String }
 }, { versionKey: false });
 
+postSchema.pre('validate', function (next) {
+  if (!this.text && !this.picture) {
+    next(new Error('Post text or picture required'));
+  } else {
+    next();
+  }
+});
+
 module.exports = mongoose.model('Post', postSchema);
