@@ -3,7 +3,6 @@ const UserModel = require('../models/User');
 
 module.exports.signUp = async (req, res, next) => {
   try {
-
     await UserModel.create({
       login: req.body.username,
       password: req.body.password,
@@ -18,7 +17,6 @@ module.exports.signUp = async (req, res, next) => {
 
 module.exports.signIn = async (req, res, next) => {
   try {
-
     const user = await UserModel.findOne()
       .where({ login: req.body.username })
       .exec();
