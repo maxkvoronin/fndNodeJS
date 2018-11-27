@@ -107,8 +107,6 @@ const _initPostObjFields = (req) => {
 const _deletePicture = (postId) => {
   return PostModel.findOne()
     .where({ _id: postId })
-    .select('picture')
-    .exec()
     .then((post) => {
       if (post.picture) {
         unlink(path.join('public', post.picture));
