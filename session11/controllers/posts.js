@@ -1,18 +1,22 @@
-const PostModel = require('../models/Post');
 const CommentModel = require('../models/Comment');
+const PostModel = require('../models/Post');
 
 const path = require('path');
 const fs = require('fs');
 const unlink = require('util').promisify(fs.unlink);
 
-module.exports.findPostById = async (req, res, next) => {
+module.exports.findOnePost = async (req, res, next) => {
   try {
-    const query = await PostModel.findById(req.params.postId).exec();
-    if (!query) {
+    const post = await PostModel.findOne()
+      .where({ _id: req.params.postId })
+      .exec();
+
+    if (!post) {
       res.status(404).json({ success: false, message: 'unknown id' });
     } else {
-      res.json(query);
+      res.json(post);
     }
+
   } catch (err) {
     next(err);
   }
@@ -20,10 +24,13 @@ module.exports.findPostById = async (req, res, next) => {
 
 module.exports.findPosts = async (req, res, next) => {
   try {
-    const query = await PostModel.find({ 'author_id': '5beeb6d6d6f6f8371d5791ee' }, null, { sort: { _id: -1 } })
-      .populate({ path: 'author', select: '-__v' }).exec();
+    const posts = await PostModel.find()
+      .sort({ _id: -1 })
+      .populate('author')
+      .lean();
 
-    res.json(query);
+    res.json(_addPostEditableField(posts, req.user._id));
+
   } catch (err) {
     next(err);
   }
@@ -31,19 +38,11 @@ module.exports.findPosts = async (req, res, next) => {
 
 module.exports.createPost = async (req, res, next) => {
   try {
-    const postData = {
-      text: req.body.text
-    };
+    const post = _initPostObjFields(req);
+    await PostModel.create(post);
 
-    // todo path for images
-    if (req.files) {
-      postData.picture = path.join('img', Date.now() + '.jpg');
-      await req.files.picture.mv(path.join('public', postData.picture));
-    }
+    res.status(201).json({ success: true, message: 'post created' });
 
-    await PostModel.create(postData);
-
-    res.status(201).end();
   } catch (err) {
     next(err);
   }
@@ -51,25 +50,23 @@ module.exports.createPost = async (req, res, next) => {
 
 module.exports.editPost = async (req, res, next) => {
   try {
-    const date = Date.now();
+    const nwPostFields = _initPostObjFields(req);
 
-    const newQuery = {
-      publicationDate: new Date(date),
-      text: req.body.text
-    };
-
-    // todo path for images
-    if (req.files) {
-      newQuery.picture = path.join('img', date.toString() + '.jpg');
-      await req.files.picture.mv(path.join('public', newQuery.picture));
+    if (req.uploadfilename) {
+      await _deletePicture(req.params.postId);
     }
 
-    const query = await PostModel.findByIdAndUpdate(req.params.postId, newQuery).exec();
-    if (!query) {
+    const result = await PostModel
+      .where({ _id: req.params.postId })
+      .updateOne(nwPostFields)
+      .exec();
+
+    if (result.n === 0) {
       res.status(404).json({ success: false, message: 'unknown id' });
     } else {
-      res.status(201).json({ success: true, result: query });
+      res.status(201).json({ success: true, message: 'post updated' });
     }
+
   } catch (err) {
     next(err);
   }
@@ -77,25 +74,51 @@ module.exports.editPost = async (req, res, next) => {
 
 module.exports.deletePost = async (req, res, next) => {
   try {
-    const findQuery = await PostModel.findById(req.params.postId, 'comments_id picture').exec();
+    await _deletePicture(req.params.postId);
+    await PostModel.deleteOne()
+      .where({ _id: req.params.postId })
+      .exec();
 
-    if (findQuery.comments_id.length !== 0) {
-      await CommentModel.deleteMany({ _id: { $in: findQuery.comments_id } }).exec();
-    }
+    await CommentModel.deleteMany()
+      .where({ post: req.params.postId })
+      .exec();
 
-    if (findQuery.picture) {
-      await unlink(path.join('public', findQuery.picture)).catch(err => console.log(err));
-    }
+    res.status(204).json({ success: true });
 
-    const deleteQuery = await PostModel.deleteOne({ _id: req.params.postId }).exec();
-
-    if (deleteQuery.n === 0) {
-      res.status(404).json({ success: false, message: 'unknown id' });
-    } else {
-      res.status(204).json({ success: true });
-    }
   } catch (err) {
     next(err);
   }
+};
 
+const _initPostObjFields = (req) => {
+  const post = {};
+  if (req.body.text) {
+    post.text = req.body.text;
+  }
+  if (req.uploadfilename) {
+    post.picture = req.uploadfilename;
+  }
+
+  post.author = req.user._id;
+
+  return post;
+};
+
+const _deletePicture = (postId) => {
+  return PostModel.findOne()
+    .where({ _id: postId })
+    .select('picture')
+    .exec()
+    .then((post) => {
+      if (post.picture) {
+        unlink(path.join('public', post.picture));
+      }
+    });
+};
+
+const _addPostEditableField = (posts, authUserId) => {
+  return posts.map(post => {
+    post.editable = post.author._id.equals(authUserId);
+    return post;
+  });
 };

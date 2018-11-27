@@ -1,3 +1,7 @@
-module.exports.render = (req, res) => {
-  res.render('layouts/login', { title: 'Login' });
+module.exports.renderLogin = (req, res) => {
+  res.render('login', { title: 'Login' });
+};
+
+module.exports.renderSignUp = (req, res) => {
+  res.render('signup', { title: 'Signup' });
 };

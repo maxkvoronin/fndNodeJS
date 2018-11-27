@@ -3,6 +3,7 @@
     "rules": {
         "no-extra-semi": "error",
         "semi": [2, "always"],
-        "no-trailing-spaces": ["error", { "skipBlankLines": true }]
+        "no-trailing-spaces": ["error", { "skipBlankLines": true }],
+        "padded-blocks": "off"
     }
 }

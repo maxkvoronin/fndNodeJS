@@ -1,3 +1,3 @@
 module.exports.render = (req, res) => {
-  res.render('layouts/notifications', { title: 'Notifications' });
+  res.render('notifications', { title: 'Notifications' });
 };
