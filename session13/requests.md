@@ -51,5 +51,5 @@ db.session13.find({"friends.0.name": { $regex:/ri/ , $options:"i" } })
 ```
 6. Напишите запрос, который вернет все документы, у которых геопозиция в поле location находится в радиусе 400 км от точки с координатами longitude = 143 latitude = 53 .
 ```
-db.places.find({ location: { $geoWithin: { $center: [ [143, 53], 10 ] } } })
+db.places.find({ location: { $geoWithin: { $center: [ [143, 53], 400 ] } } })
 ```
