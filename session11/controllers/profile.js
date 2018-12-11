@@ -19,7 +19,7 @@ module.exports.render = async (req, res) => {
 
 module.exports.saveUserProfile = async (req, res, next) => {
   try {
-    const tmp = await UserModel
+    await UserModel
       .where({ _id: req.body.id })
       .updateOne({
         username :   req.body.username,

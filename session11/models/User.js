@@ -8,7 +8,7 @@ const userSchema = mongoose.Schema({
   firstName:      { type: String },
   lastName:       { type: String },
   description:    { type: String },
-  avatarUrl:      { type: String, default: 'images/trump.jpg' },
+  avatarUrl:      { type: String, default: 'images/term.jpeg' },
   email:          { type: String },
 
   postsNumber:    { type: Number },
