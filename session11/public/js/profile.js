@@ -43,7 +43,8 @@ document.addEventListener("DOMContentLoaded", function() {
         postsNumber.innerText = profile.postsNumber;
         likesNumber.innerText = profile.likesNumber;
         commentsNumber.innerText = profile.commentsNumber;
-        commentsAVG.innerText = profile.commentsAVG;
+        const cAvg = Number(profile.postsNumber) / Number(profile.commentsNumber);
+        commentsAVG.innerText = (cAvg === Infinity) ? '0' : cAvg;//profile.commentsAVG;
         profileLink.setAttribute('src', `/profile/${profile._id}`);
         if (!profile.editable) {
              editBtn.classList.add('hide');
