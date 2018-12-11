@@ -4,10 +4,8 @@ const passport = require('passport');
 const router = express.Router();
 const ctrlProfile = require('../controllers/profile');
 
-//router.use(passport.authenticate('jwt', { session: false }));
-
 router.get ('/',        ctrlProfile.render);
-router.post('/',        ctrlProfile.saveUserProfile);
-router.get ('/:userId', ctrlProfile.getUserProfile);
+router.post('/',        passport.authenticate('jwt', { session: false }), ctrlProfile.saveUserProfile);
+router.get ('/:userId', passport.authenticate('jwt', { session: false }), ctrlProfile.getUserProfile);
 
 module.exports = router;

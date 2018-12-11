@@ -2,8 +2,6 @@ const CommentModel = require('../models/Comment');
 const PostModel = require('../models/Post');
 const LikeModel = require('../models/Like');
 
-
-
 module.exports.findOnePost = async (req, res, next) => {
   try {
     const post = await PostModel.getPost(req.params.postId);

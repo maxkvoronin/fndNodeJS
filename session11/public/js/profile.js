@@ -45,9 +45,9 @@ document.addEventListener("DOMContentLoaded", function() {
         commentsNumber.innerText = profile.commentsNumber;
         commentsAVG.innerText = profile.commentsAVG;
         profileLink.setAttribute('src', `/profile/${profile._id}`);
-        // if (!profile.editable) {
-        //     editBtn.classList.add('hide');
-        // }
+        if (!profile.editable) {
+             editBtn.classList.add('hide');
+        }
     }
 
     function initListeners() {

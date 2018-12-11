@@ -30,5 +30,4 @@ likeSchema.statics.delete = function (postId, authorId) {
   this.deleteOne().where({ post: postId, author: authorId }).exec();
 };
 
-
 module.exports = mongoose.model('Like', likeSchema);

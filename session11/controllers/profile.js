@@ -38,9 +38,12 @@ module.exports.saveUserProfile = async (req, res, next) => {
 
 module.exports.getUserProfile = async (req, res, next) => {
   try {
+
     const profile = await UserModel.find()
       .where({ _id: req.params.userId})
-      .exec();
+      .lean();
+
+    profile[0].editable = profile[0]._id.equals(req.user._id);
 
     res.json(profile[0]);
   }
