@@ -19,6 +19,7 @@ const apiPostsRouter = require('./routes/posts');
 const app = express();
 
 app.use(passport.initialize());
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
@@ -59,7 +60,7 @@ app.use((err, req, res, next) => {
 
   console.log(err);
   // render the error page
-  res.status(err.status || 500);
+  //res.status(err.status || 500);
   res.json({success: false, message: err.message});
 });
 

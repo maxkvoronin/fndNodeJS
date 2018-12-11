@@ -5,6 +5,7 @@ const router = express.Router();
 
 const ctrlPosts = require('../controllers/posts');
 const ctrlComment = require('../controllers/comments');
+const ctrlLikes = require('../controllers/likes');
 
 const savePicture = require('../middleware/savePicture');
 
@@ -21,5 +22,7 @@ router.post  ('/:postId/comments', ctrlComment.createComment);
 router.get   ('/:postId/comments/:commentId', ctrlComment.findCommentById);
 router.patch ('/:postId/comments/:commentId', ctrlComment.editComment);
 router.delete('/:postId/comments/:commentId', ctrlComment.deleteComment);
+
+router.post  ('/:postId/likes', ctrlLikes.setLikeOrDislike);
 
 module.exports = router;

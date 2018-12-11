@@ -1,13 +1,50 @@
 /* eslint-disable no-trailing-spaces */
-const hbs = require('hbs');
+const UserModel = require('../models/User');
+//const hbs = require('hbs');
 
 const layoutPageTitle = 'Profile';
 
 // Helper for indication active css class in navigation bar
-module.exports.render = (req, res) => {
+module.exports.render = async (req, res) => {
 //   hbs.registerHelper({
 //     activeProfileLayoutHelper: layout => layout.data.root.title === layoutPageTitle ? new hbs.SafeString('active') : ''
 //   });
-
+  //console.log(">>>>>>>>>>>>"+req.query.id);
   res.render('profile', { title: layoutPageTitle });
+};
+
+module.exports.saveUserProfile = async (req, res, next) => {
+  try {
+    const tmp = await UserModel
+      .where({ _id: req.body.id })
+      .updateOne({
+        username :   req.body.username,
+        password :   req.body.password,
+        firstName:   req.body.firstName,
+        lastName:    req.body.lastName,
+        email:       req.body.email,
+        description: req.body.description,
+      })
+      .exec();
+
+    console.log(tmp);
+
+    res.status(201).end();
+  }
+  catch (err) {
+    next(err);
+  }
+};
+
+module.exports.getUserProfile = async (req, res, next) => {
+  try {
+    const profile = await UserModel.find()
+      .where({ _id: req.params.userId})
+      .exec();
+
+    res.json(profile[0]);
+  }
+  catch (err) {
+    next(err);
+  }
 };

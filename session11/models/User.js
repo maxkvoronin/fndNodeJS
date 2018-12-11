@@ -2,11 +2,17 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt-nodejs');
 
 const userSchema = mongoose.Schema({
-  _id:      { type: mongoose.Schema.Types.ObjectId, auto: true },
-  login:    { type: String, unique: true, required: [true, 'Username is required'] },
-  password: { type: String, required: [true, 'Password is required'] },
-  fullname: { type: String, required: [true, 'Fullname is required'] },
-  avatar:   { type: String, default: 'images/trump.jpg' }
+  _id:            { type: mongoose.Schema.Types.ObjectId, auto: true },
+  username:       { type: String, unique: true, required: [true, 'Username is required'] },
+  password:       { type: String, required: [true, 'Password is required'] },
+  firstName:      { type: String },
+  lastName:       { type: String },
+  description:    { type: String },
+  avatarUrl:      { type: String, default: 'images/trump.jpg' },
+  email:          { type: String },
+
+  postsNumber:    { type: Number },
+  likesNumber:    { type: Number }
 }, { versionKey: false });
 
 userSchema.pre('save', function (next) {

@@ -49,13 +49,13 @@ module.exports.createComment = async (req, res, next) => {
 
 module.exports.editComment = async (req, res, next) => {
   try {
-    // const post = await PostModel.find()
-    //   .where({ _id: req.params.postId })
-    //   .exec();
-    //
-    // if (!post) {
-    //   res.status(404).json({ success: false, message: 'unknown post id' });
-    // } else {
+    const post = await PostModel.find()
+      .where({ _id: req.params.postId })
+      .exec();
+
+    if (!post) {
+      res.status(404).json({ success: false, message: 'unknown post id' });
+    } else {
 
       const comment = await CommentModel
         .where({ _id: req.params.commentId })
@@ -67,7 +67,7 @@ module.exports.editComment = async (req, res, next) => {
       } else {
         res.status(201).json({ success: true, message: 'comment updated' });
       }
-    // }
+    }
 
   } catch (err) {
     next(err);

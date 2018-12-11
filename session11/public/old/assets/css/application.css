@@ -78,3 +78,15 @@ strong {
 .l img {
   width: 100%;
 }
+
+.commentBlock {
+  padding-top: 20px;
+}
+
+.hide {
+  display: none;
+}
+
+#logout:before {
+  content: "\EAEB";
+}

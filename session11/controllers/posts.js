@@ -1,15 +1,12 @@
 const CommentModel = require('../models/Comment');
 const PostModel = require('../models/Post');
+const LikeModel = require('../models/Like');
 
-const path = require('path');
-const fs = require('fs');
-const unlink = require('util').promisify(fs.unlink);
+
 
 module.exports.findOnePost = async (req, res, next) => {
   try {
-    const post = await PostModel.findOne()
-      .where({ _id: req.params.postId })
-      .exec();
+    const post = await PostModel.getPost(req.params.postId);
 
     if (!post) {
       res.status(404).json({ success: false, message: 'unknown id' });
@@ -24,13 +21,13 @@ module.exports.findOnePost = async (req, res, next) => {
 
 module.exports.findPosts = async (req, res, next) => {
   try {
-    const posts = await PostModel.find()
-      .sort({ _id: -1 })
-      .populate('author')
-      .lean();
+    let posts = await PostModel.getPosts();
+    posts = PostModel.addEditableProperty(posts, req.user._id);
 
-    res.json(_addPostEditableField(posts, req.user._id));
+    const likedPostsIds = await LikeModel.getLikedPostsIds(posts, req.user._id);
+    posts = LikeModel.addLikesProperty(posts, likedPostsIds);
 
+    res.json(posts);
   } catch (err) {
     next(err);
   }
@@ -38,8 +35,7 @@ module.exports.findPosts = async (req, res, next) => {
 
 module.exports.createPost = async (req, res, next) => {
   try {
-    const post = _initPostObjFields(req);
-    await PostModel.create(post);
+    await PostModel.createPost(req);
 
     res.status(201).json({ success: true, message: 'post created' });
 
@@ -50,16 +46,11 @@ module.exports.createPost = async (req, res, next) => {
 
 module.exports.editPost = async (req, res, next) => {
   try {
-    const nwPostFields = _initPostObjFields(req);
+    const result = PostModel.updatePost(req);
 
     if (req.uploadfilename) {
-      await _deletePicture(req.params.postId);
+      await PostModel.deletePicture(req.params.postId);
     }
-
-    const result = await PostModel
-      .where({ _id: req.params.postId })
-      .updateOne(nwPostFields)
-      .exec();
 
     if (result.n === 0) {
       res.status(404).json({ success: false, message: 'unknown id' });
@@ -74,49 +65,14 @@ module.exports.editPost = async (req, res, next) => {
 
 module.exports.deletePost = async (req, res, next) => {
   try {
-    await _deletePicture(req.params.postId);
-    await PostModel.deleteOne()
-      .where({ _id: req.params.postId })
-      .exec();
-
-    await CommentModel.deleteMany()
-      .where({ post: req.params.postId })
-      .exec();
+    await PostModel.deletePicture(req.params.postId);
+    await PostModel.deletePost(req.params.postId);
+  //todo delete likes
+    await CommentModel.deleteMany().where({ post: req.params.postId }).exec();
 
     res.status(204).json({ success: true });
 
   } catch (err) {
     next(err);
   }
-};
-
-const _initPostObjFields = (req) => {
-  const post = {};
-  if (req.body.text) {
-    post.text = req.body.text;
-  }
-  if (req.uploadfilename) {
-    post.picture = req.uploadfilename;
-  }
-
-  post.author = req.user._id;
-
-  return post;
-};
-
-const _deletePicture = (postId) => {
-  return PostModel.findOne()
-    .where({ _id: postId })
-    .then((post) => {
-      if (post.picture) {
-        unlink(path.join('public', post.picture));
-      }
-    });
-};
-
-const _addPostEditableField = (posts, authUserId) => {
-  return posts.map(post => {
-    post.editable = post.author._id.equals(authUserId);
-    return post;
-  });
 };

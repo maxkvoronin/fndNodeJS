@@ -1,16 +1,18 @@
-document.addEventListener("DOMContentLoaded", function() {
-    const loginUrl = '/login-api/signin';
+document.addEventListener("DOMContentLoaded", function(event) {
+    const loginUrl = '/login-api/signup';
 
+    const fullName = document.getElementById('fullName');
     const userName = document.getElementById('username');
     const passWord = document.getElementById('password') ;
-    const login = document.getElementById('login');
+    const singup = document.getElementById('singup');
     const growl = document.getElementById('app-growl');
 
-    login.addEventListener('click', (event) => {
-
+    singup.addEventListener('click', (event) => {
+        console.log('clicked');
         event.preventDefault();
 
         let formData = new FormData();
+        formData.append('fullname', fullName.value);
         formData.append('username', userName.value);
         formData.append('password', passWord.value);
 
@@ -20,26 +22,22 @@ document.addEventListener("DOMContentLoaded", function() {
         })
             .then((response) => response.json())
             .then((response) => {
-                console.log(response);
                 if (response.success) {
                     let growlBody = document.createElement('div');
                     growlBody.classList.add('alert', 'alert-dark', 'alert-dismissible', 'fade', 'show');
                     growlBody.setAttribute('role', 'alert');
-                    const text = document.createTextNode('Успешный вход в систему.');
+                    const text = document.createTextNode('Пользователь успешно создан. Войдите в систему под своей новой учетной записью');
                     growlBody.appendChild(text);
                     growl.appendChild(growlBody);
-
-                    localStorage.setItem('token', response.token);
-                    localStorage.setItem('current_user_id', response.userId);
-
                     setTimeout(() => {
-                        window.location = '/';
+                        growl.innerHTML = '';
+                        window.location = '/login'
                     }, 2*1000);
                 } else {
                     let growlBody = document.createElement('div');
                     growlBody.classList.add('alert', 'alert-dark', 'alert-dismissible', 'fade', 'show');
                     growlBody.setAttribute('role', 'alert');
-                    const text = document.createTextNode('Не авторизировано.');
+                    const text = document.createTextNode('Введите корректно логин и пароль.');
                     growlBody.appendChild(text);
                     growl.appendChild(growlBody);
 

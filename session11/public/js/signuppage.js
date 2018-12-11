@@ -1,9 +1,13 @@
 document.addEventListener("DOMContentLoaded", function(event) {
     const loginUrl = '/login-api/signup';
 
-    const fullName = document.getElementById('fullName');
     const userName = document.getElementById('username');
     const passWord = document.getElementById('password') ;
+    const firstName = document.getElementById('firstName') ;
+    const lastName = document.getElementById('lastName') ;
+    const description = document.getElementById('description') ;
+    const email = document.getElementById('email') ;
+
     const singup = document.getElementById('singup');
     const growl = document.getElementById('app-growl');
 
@@ -12,9 +16,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
         event.preventDefault();
 
         let formData = new FormData();
-        formData.append('fullname', fullName.value);
         formData.append('username', userName.value);
         formData.append('password', passWord.value);
+        formData.append('firstName', firstName.value);
+        formData.append('lastName', lastName.value);
+        formData.append('description', description.value);
+        formData.append('email', email.value);
 
         fetch(loginUrl, {
             method: 'POST',

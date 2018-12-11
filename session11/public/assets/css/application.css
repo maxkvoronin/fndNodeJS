@@ -90,3 +90,16 @@ strong {
 #logout:before {
   content: "\EAEB";
 }
+
+.qqq {
+  margin: auto;
+  width: 50%;
+  padding: 10px;
+}
+
+.hide {
+  display: none !important;
+}
+.show {
+  display: block !important;
+}
