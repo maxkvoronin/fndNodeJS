@@ -20,7 +20,6 @@ document.addEventListener("DOMContentLoaded", function() {
         })
             .then((response) => response.json())
             .then((response) => {
-                console.log(response);
                 if (response.success) {
                     let growlBody = document.createElement('div');
                     growlBody.classList.add('alert', 'alert-dark', 'alert-dismissible', 'fade', 'show');

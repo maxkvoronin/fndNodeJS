@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt-nodejs');
 
+const userStats = require('../plugins/user.stats');
+
 const userSchema = mongoose.Schema({
   _id:            { type: mongoose.Schema.Types.ObjectId, auto: true },
   username:       { type: String, unique: true, required: [true, 'Username is required'] },
@@ -11,9 +13,10 @@ const userSchema = mongoose.Schema({
   avatarUrl:      { type: String, default: 'images/term.jpeg' },
   email:          { type: String },
 
-  postsNumber:    { type: Number },
-  likesNumber:    { type: Number }
 }, { versionKey: false });
+
+//userSchema.plugin(userStats);
+
 
 userSchema.pre('save', function (next) {
   if (this.isModified('password') || this.isNew) {

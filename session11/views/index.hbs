@@ -83,16 +83,11 @@
 
         </ul>
 
-        <form class="nn acx d-none vt">
-            <input class="form-control" type="text" data-action="grow" placeholder="Search">
+        <form class="nn acx d-none vt" id="search-form">
+            <input class="form-control" type="text" data-action="grow" placeholder="Search" id="search-input">
         </form>
 
         <ul id="#js-popoverContent" class="nav navbar-nav acx aek d-none vt">
-            <li class="pi">
-                <a class="g pg" href="/notifications">
-                    <span class="h azy"></span>
-                </a>
-            </li>
             <li class="pi" id="logout-box">
                 <a class="g pg" href="#">
                     <span class="h azy" id="logout"></span>
@@ -246,59 +241,7 @@
                 </div>
             </div>
 
-            <div class="pz vp vy afo">
-                <div class="qa">
-                    <h6 class="afh">About
-                        <small>· <a href="#">Edit</a></small>
-                    </h6>
-                    <ul class="dc axg">
-                        <li><span class="axc h ban aff"></span>Went to <a href="#">Oh, Canada</a>
-                        <li><span class="axc h bnc aff"></span>Became friends with <a href="#">Obama</a>
-                        <li><span class="axc h bfa aff"></span>Worked at <a href="#">Github</a>
-                        <li><span class="axc h bfq aff"></span>Lives in <a href="#">San Francisco, CA</a>
-                        <li><span class="axc h bgz aff"></span>From <a href="#">Seattle, WA</a>
-                    </ul>
-                </div>
-            </div>
 
-            <div class="pz vp vy afo">
-                <div class="qa">
-                    <h6 class="afh">Photos
-                        <small>· <a href="#">Edit</a></small>
-                    </h6>
-                    <div data-grid="images" data-target-height="150">
-                        <div>
-                            <img data-width="640" data-height="640" data-action="zoom"
-                                 src="/assets/img/instagram_5.jpg">
-                        </div>
-
-                        <div>
-                            <img data-width="640" data-height="640" data-action="zoom"
-                                 src="/assets/img/instagram_6.jpg">
-                        </div>
-
-                        <div>
-                            <img data-width="640" data-height="640" data-action="zoom"
-                                 src="/assets/img/instagram_7.jpg">
-                        </div>
-
-                        <div>
-                            <img data-width="640" data-height="640" data-action="zoom"
-                                 src="/assets/img/instagram_8.jpg">
-                        </div>
-
-                        <div>
-                            <img data-width="640" data-height="640" data-action="zoom"
-                                 src="/assets/img/instagram_9.jpg">
-                        </div>
-
-                        <div>
-                            <img data-width="640" data-height="640" data-action="zoom"
-                                 src="/assets/img/instagram_10.jpg">
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div class="fm">
@@ -311,6 +254,23 @@
             </ul>
             <ul class="ca bow box afo" id="feed">
             </ul>
+            <ul class="ca bow box afo" id="load-more-box">
+                <li class="rv b agz">
+                    <a class="boa">
+                        <button class="cg nz ok" id="load-more-button">Загрузить еще</button>
+                    </a>
+                </li>
+            </ul>
+            <ul class="ca bow box afo hide" id="go-top-box">
+                <li class="rv b agz">
+                    <a class="boa">
+                        <!--<button class="cg nz ok" id="go-top-button"></button>-->
+                        <button class="cg nz ok"  title="Вверх" id="go-top-button">
+                            <span class="h ayt"></span> Вверх
+                        </button>
+                    </a>
+                </li>
+            </ul>
 
 
         </div>
@@ -321,77 +281,11 @@
                 <a class="rj" href="/profile">Visit your profile!</a> Check your self, you aren't looking well.
             </div>
 
-            <div class="pz afo d-none vy">
-                <div class="qa">
-                    <h6 class="afh">Sponsored</h6>
-                    <div data-grid="images" data-target-height="150">
-                        <img class="bos" data-width="640" data-height="640" data-action="zoom"
-                             src="/assets/img/instagram_2.jpg">
-                    </div>
-                    <p><strong>It might be time to visit Iceland.</strong> Iceland is so chill, and everything looks
-                        cool here. Also, we heard the people are pretty nice. What are you waiting for?</p>
-                    <button class="cg nz ok">Buy a ticket</button>
-                </div>
-            </div>
-
-            <div class="pz afo d-none vy">
-                <div class="qa">
-                    <h6 class="afh">Likes
-                        <small>· <a href="#">View All</a></small>
-                    </h6>
-                    <ul class="bow box">
-                        <li class="rv afa">
-                            <img
-                                    class="bos vb yb aff"
-                                    src="/assets/img/avatar-fat.jpg">
-                            <div class="rw">
-                                <strong>Jacob Thornton</strong> @fat
-                                <div class="bpa">
-                                    <button class="cg nz ok">
-                                        <span class="h ayi"></span> Follow
-                                    </button>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="rv">
-                            <a class="bpu" href="#">
-                                <img
-                                        class="bos vb yb aff"
-                                        src="/assets/img/avatar-mdo.png">
-                            </a>
-                            <div class="rw">
-                                <strong>Mark Otto</strong> @mdo
-                                <div class="bpa">
-                                    <button class="cg nz ok">
-                                        <span class="h ayi"></span> Follow
-                                    </button>
-                                    </button>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-                <div class="qg">
-                    Dave really likes these nerds, no one knows why though.
-                </div>
-            </div>
 
             <div class="pz bpm">
                 <div class="qa">
-                    © 2018 Bootstrap
-                    <a href="#">About</a>
-                    <a href="#">Help</a>
-                    <a href="#">Terms</a>
-                    <a href="#">Privacy</a>
-                    <a href="#">Cookies</a>
-                    <a href="#">Ads </a>
-                    <a href="#">Info</a>
-                    <a href="#">Brand</a>
-                    <a href="#">Blog</a>
-                    <a href="#">Status</a>
-                    <a href="#">Apps</a>
-                    <a href="#">Jobs</a>
-                    <a href="#">Advertise</a>
+                    © 2018 JSExpert
+                    <a href="https://www.jsexpert.net/" target="_blank">JSExpert Homepage</a>
                 </div>
             </div>
         </div>

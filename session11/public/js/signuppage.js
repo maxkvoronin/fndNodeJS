@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         event.preventDefault();
 
         let formData = new FormData();
+        formData.append('fullName', fullName.value);
         formData.append('username', userName.value);
         formData.append('password', passWord.value);
         formData.append('firstName', firstName.value);

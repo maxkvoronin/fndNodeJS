@@ -1,6 +1,5 @@
 const CommentModel = require('../models/Comment');
 const PostModel = require('../models/Post');
-const LikeModel = require('../models/Like');
 
 module.exports.findOnePost = async (req, res, next) => {
   try {
@@ -19,13 +18,12 @@ module.exports.findOnePost = async (req, res, next) => {
 
 module.exports.findPosts = async (req, res, next) => {
   try {
-    let posts = await PostModel.getPosts();
-    posts = PostModel.addEditableProperty(posts, req.user._id);
+    //const resObj = {};
+    const posts = await PostModel.getPosts(req.user._id, req.query.page, req.query.query);
+    //resObj.isEnd = (await PostModel.countDocuments(
+    // {text: new RegExp(req.query.query, 'g')}) <= ( postsCfg.postsPerPage * req.query.page ) );
 
-    const likedPostsIds = await LikeModel.getLikedPostsIds(posts, req.user._id);
-    posts = LikeModel.addLikesProperty(posts, likedPostsIds);
-
-    res.json(posts);
+    res.json(posts[0]);
   } catch (err) {
     next(err);
   }
@@ -34,7 +32,6 @@ module.exports.findPosts = async (req, res, next) => {
 module.exports.createPost = async (req, res, next) => {
   try {
     await PostModel.createPost(req);
-
     res.status(201).json({ success: true, message: 'post created' });
 
   } catch (err) {

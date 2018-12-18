@@ -2,17 +2,14 @@ const mongoose = require('mongoose');
 const path = require('path');
 const fs = require('fs');
 const unlink = require('util').promisify(fs.unlink);
-
-require('../models/User');
-require('../models/Comment');
+const postsCfg = require('../configs/posts.config');
 
 const postSchema = mongoose.Schema({
   _id:             { type: mongoose.Schema.Types.ObjectId, auto: true },
   author:          { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   publicationDate: { type: Date, default: Date.now },
-  text:            { type: String },
-  picture:         { type: String },
-  numberOfLikes:   { type: Number, default: 0 }
+  text:            { type: String, text: true },
+  picture:         { type: String }
 }, { versionKey: false });
 
 postSchema.pre('validate', function (next) {
@@ -29,11 +26,53 @@ postSchema.statics.createPost = function (req) {
 };
 
 postSchema.statics.getPost = function (id) {
-  return this.findOne().where({ _id: id }).exec();
+  return this.findOne().where({ _id: id });
 };
 
-postSchema.statics.getPosts = function () {
-  return this.find().sort({ _id: -1 }).populate('author').lean();
+postSchema.statics.getPosts = function (authUserId, page, searchTxt = '') {
+
+  return this.aggregate([
+      { $match: {
+          text: { $regex: new RegExp(searchTxt) } } },
+      { $sort: {
+          _id: -1} },
+      { $facet : {
+          meta: [
+            { $count: "totalDocs" },
+          ],
+          posts: [
+            { $skip: (page - 1) * postsCfg.postsPerPage },
+            { $limit: postsCfg.postsPerPage },
+            { $lookup: {
+                "from": "users",
+                "localField": "author",
+                "foreignField": "_id",
+                "as": "author" } },
+            { $unwind: "$author"},
+            { $lookup: {
+                "from": "likes",
+                "localField": "_id",
+                "foreignField": "post",
+                "as": "like" } },
+            { $project: {
+                "author.firstName": "$author.firstName",
+                "author.lastName":  "$author.lastName",
+                "author.avatarUrl": "$author.avatarUrl",
+                _id: 1,
+                text: 1,
+                picture: 1,
+                publicationDate: 1,
+                numberOfLikes: { $size: "$like" },
+                isLiked:  { $in: [authUserId, "$like.author"]},
+                editable: { $eq: [authUserId, "$author._id"]}, }
+            },
+          ]
+      } },
+      { $project: {
+        isEnd: { $lte: [{$arrayElemAt: [ "$meta.totalDocs", 0 ]}, postsCfg.postsPerPage * page ]},
+        posts: 1
+    } }
+  ]);
 };
 
 postSchema.statics.updatePost = function (req) {
@@ -43,17 +82,6 @@ postSchema.statics.updatePost = function (req) {
 
 postSchema.statics.deletePost = function (id) {
   this.deleteOne().where({ _id: id}).exec();
-};
-
-postSchema.statics.addEditableProperty = function (posts, authUserId) {
-  return posts.map(post => {
-    post.editable = post.author._id.equals(authUserId);
-    return post;
-  });
-};
-
-postSchema.statics.updateLikeCount = function (postId, increment) {
-  return this.findOneAndUpdate({ _id: postId }, {$inc : {'numberOfLikes' : increment}}).exec();
 };
 
 postSchema.statics.deletePicture = function (postId) {

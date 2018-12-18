@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function() {
         })
             .then((response) => response.json())
             .then((response) => {
+                console.log(response);
                 if (response.success) {
                     let growlBody = document.createElement('div');
                     growlBody.classList.add('alert', 'alert-dark', 'alert-dismissible', 'fade', 'show');
@@ -29,6 +30,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     growl.appendChild(growlBody);
 
                     localStorage.setItem('token', response.token);
+                    localStorage.setItem('current_user_id', response.userId);
 
                     setTimeout(() => {
                         window.location = '/';

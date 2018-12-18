@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const profileDescription = document.getElementById('profile-description');
     const profileImg = document.getElementById('profile-img');
+    const profileIco = document.getElementById('profile-ico');
     const profileFullName = document.getElementById('profile');
     const profileLogin = document.getElementById('profile-login');
     const profileEmail = document.getElementById('profile-email');
@@ -36,6 +37,7 @@ document.addEventListener("DOMContentLoaded", function() {
         profileDescription.innerText = profile.description;
         profileFullName.innerText = `${profile.firstName} ${profile.lastName}`;
         profileImg.setAttribute('src', profile.avatarUrl);
+        profileIco.setAttribute('src', profile.avatarUrl);
         profileLogin.innerText = profile.username;
         profileEmail.innerText = profile.email;
         profileFirstName.innerText = profile.firstName;
@@ -47,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function() {
         commentsAVG.innerText = (cAvg === Infinity) ? '0' : cAvg;//profile.commentsAVG;
         profileLink.setAttribute('src', `/profile/${profile._id}`);
         if (!profile.editable) {
-             editBtn.classList.add('hide');
+            editBtn.classList.add('hide');
         }
     }
 

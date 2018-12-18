@@ -14,9 +14,15 @@ document.addEventListener("DOMContentLoaded", function () {
     const profileImg = document.getElementById('profile-img');
     const profileDescription = document.getElementById('profile-description');
 
-
+    const searchForm = document.getElementById('search-form');
+    const searchInput = document.getElementById('search-input');
+    const loadMoreButton = document.getElementById('load-more-button');
+    const loadMoreBox = document.getElementById('load-more-box');
+    const goTopBox = document.getElementById('go-top-box');
+    const goTopButton = document.getElementById('go-top-button');
 
     let actualPosts = [];
+    let postsPage = 1;
 
     init();
 
@@ -24,36 +30,9 @@ document.addEventListener("DOMContentLoaded", function () {
         if (localStorage.getItem('token') || localStorage.getItem('current_user_id')) {
             body.classList.remove('hide');
 
-            const apiToken = localStorage.getItem('token');
-            const currentUserId = localStorage.getItem('current_user_id');
+            getUserDataAndRender();
 
-            const headers = new Headers();
-            headers.append('Authorization', apiToken);
-
-            fetch(`${userProfileUrl}/${currentUserId}`,{method: 'GET', headers: headers})
-                .then(response => {
-                    if (response.status === 403) window.location = '/login';
-                    return response;
-                })
-                .then(response => response.json())
-                .then(response => {
-                    let userProfile = response;
-                    renderUserProfile(userProfile);
-                });
-
-            fetch(postsUrl, {method: 'GET', headers: headers})
-                .then(response => {
-                    if (response.status === 403) window.location = '/login';
-                    return response;
-                })
-                .then(response => response.json())
-                .then(response => {
-                    actualPosts = response;
-                    renderPosts(actualPosts);
-                    renderComments(actualPosts);
-                    initListeners();
-                })
-                .catch(e => console.log(e));
+            getPostsAndRender(searchInput.value);
 
 
         } else {
@@ -66,17 +45,31 @@ document.addEventListener("DOMContentLoaded", function () {
     function renderPosts(posts) {
         feed.innerText = '';
 
+        // if (posts.length === 0) {
+        //     let timer = 3;
+        //     feed.innerText = `Нет публикаций за таким запросом. Возврат на главную через ${timer} секунд`;
+        //     postsPage = 1;
+        //     let interval = setInterval(() => {
+        //         timer--;
+        //         feed.innerText = `Нет публикаций за таким запросом. Возврат на главную через ${timer} секунд`;
+        //         if (timer === 0) {
+        //             clearTimeout(interval);
+        //             scrollTopAndRefresh();
+        //         }
+        //     }, 1000);
+        // }
+
+
         posts.forEach(post => {
-            feed.innerHTML += (post.editable)
-                ? `<li class="rv b agz">
+            feed.innerHTML += (post.editable) ?
+                `<li class="rv b agz">
               <img class="bos vb yb aff" src="${post.author.avatarUrl}">
               <div class="rw">
                 <div class="bpb">
                   <small class="acx axc">${moment(post.publicationDate).fromNow()}</small>
                   <h6><a href="/profile?id=${post.author._id}">${post.author.firstName} ${post.author.lastName}</a></h6>
                 </div>
-    
-                <p>${post.text}
+                <p>${post.text.replace(new RegExp(searchInput.value, 'g'), '<strong>'+searchInput.value+'</strong>')}
                 </p>
     
                 <div class="boy" data-grid="images"><img style="display: inline-block; width: 346px; height: 335px; margin-bottom: 10px; margin-right: 0px; vertical-align: bottom;" data-width="640" data-height="640" data-action="zoom" src="${post.picture}"></div>
@@ -111,8 +104,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 <ul class="bow afa commentBlock" id="comment-${post._id}">
                 </ul>
               </div>
-            </li>`
-                : `<li class="rv b agz">
+            </li>` :
+                `<li class="rv b agz">
               <img class="bos vb yb aff" src="${post.author.avatarUrl}">
               <div class="rw">
                 <div class="bpb">
@@ -120,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
                   <h6><a href="/profile?id=${post.author._id}">${post.author.firstName} ${post.author.lastName}</a></h6>
                 </div>
     
-                <p>${post.text}
+                <p>${post.text.replace(new RegExp(searchInput.value, 'g'), '<strong>'+searchInput.value+'</strong>')}
                 </p>
     
                 <div class="boy" data-grid="images"><img style="display: inline-block; width: 346px; height: 335px; margin-bottom: 10px; margin-right: 0px; vertical-align: bottom;" data-width="640" data-height="640" data-action="zoom" src="${post.picture}"></div>
@@ -168,7 +161,10 @@ document.addEventListener("DOMContentLoaded", function () {
             const headers = new Headers();
             headers.append('Authorization', apiToken);
 
-            fetch(`${commentsUrl}/${post._id}/comments`, {method: 'GET', headers: headers})
+            fetch(`${commentsUrl}/${post._id}/comments`, {
+                method: 'GET',
+                headers: headers
+            })
                 .then(response => {
                     if (response.status === 403) window.location = '/login';
                     return response;
@@ -177,8 +173,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 .then(response => {
                     response
                         .forEach(comment => {
-                            commentBlock.innerHTML += (comment.editable)
-                                ? `<li class="rv afh">
+                            commentBlock.innerHTML += (comment.editable) ?
+                                `<li class="rv afh">
                                         <div class="qa">
                                             <div class="rv">
                                                 <img class="bos us aff yb" src="${comment.author.avatarUrl}">
@@ -202,8 +198,8 @@ document.addEventListener("DOMContentLoaded", function () {
                                                 </div>
                                             </div>
                                         </div>
-                                      </li>`
-                                : `<li class="rv afh">
+                                      </li>` :
+                                `<li class="rv afh">
                                     <div class="qa">
                                         <div class="rv">
                                             <img class="bos us aff yb" src="${comment.author.avatarUrl}">
@@ -241,6 +237,10 @@ document.addEventListener("DOMContentLoaded", function () {
         feed.addEventListener('click', editCommentListener);
         feed.addEventListener('click', deleteCommentListener);
         logout.addEventListener('click', logOutListener);
+
+        searchForm.addEventListener('submit', searchFormListener);
+        loadMoreButton.addEventListener('click', loadMoreButtonListener);
+        goTopButton.addEventListener('click', scrollTopAndRefresh);
     }
 
     function postModalCreateListener(e) {
@@ -395,7 +395,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const headers = new Headers();
         headers.append('Authorization', apiToken);
 
-        fetch(`${postsUrl}/${id}`, {method: 'GET', headers: headers})
+        fetch(`${postsUrl}/${id}`, {
+            method: 'GET',
+            headers: headers
+        })
             .then(response => {
                 if (response.status === 403) window.location = '/login';
                 return response;
@@ -431,7 +434,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     headers.append('Authorization', apiToken);
 
 
-                    fetch(`${postsUrl}/${id}`, {method: 'PATCH', body: formData, headers: headers})
+                    fetch(`${postsUrl}/${id}`, {
+                        method: 'PATCH',
+                        body: formData,
+                        headers: headers
+                    })
                         .then(response => {
                             if (response.status === 403) window.location = '/login';
                             return response;
@@ -459,8 +466,11 @@ document.addEventListener("DOMContentLoaded", function () {
         let formData = new FormData();
         //formData.append('postId', id);
 
-
-        fetch(`${likesUrl}/${id}/likes`, {method: 'POST', body: formData, headers: headers})
+        fetch(`${likesUrl}/${id}/likes`, {
+            method: 'POST',
+            body: formData,
+            headers: headers
+        })
             .then(response => {
                 if (response.status === 403) window.location = '/login';
                 return response;
@@ -478,7 +488,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const headers = new Headers();
         headers.append('Authorization', apiToken);
 
-        fetch(`${postsUrl}/${id}`, {method: 'DELETE', headers: headers})
+        fetch(`${postsUrl}/${id}`, {
+            method: 'DELETE',
+            headers: headers
+        })
             .then(response => {
                 if (response.status === 403) window.location = '/login';
                 return response;
@@ -501,7 +514,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const headers = new Headers();
         headers.append('Authorization', apiToken);
 
-        fetch(`${commentUrl}/${postId}/comments/${commentId}`, {method: 'GET', headers: headers})
+        fetch(`${commentUrl}/${postId}/comments/${commentId}`, {
+            method: 'GET',
+            headers: headers
+        })
             .then(response => {
                 if (response.status === 403) window.location = '/login';
                 return response;
@@ -515,7 +531,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     formData.append('text', commentTextEdit.value);
                     //formData.append('_id', comment._id);
 
-                    fetch(`${commentUrl}/${postId}/comments/${commentId}`, {method: 'PATCH', body: formData, headers: headers})
+                    fetch(`${commentUrl}/${postId}/comments/${commentId}`, {
+                        method: 'PATCH',
+                        body: formData,
+                        headers: headers
+                    })
                         .then(response => {
                             if (response.status === 403) window.location = '/login';
                             return response;
@@ -542,7 +562,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const headers = new Headers();
         headers.append('Authorization', apiToken);
 
-        fetch(`${commentUrl}/${postId}/comments/${commentId}`, {method: 'DELETE', headers: headers})
+        fetch(`${commentUrl}/${postId}/comments/${commentId}`, {
+            method: 'DELETE',
+            headers: headers
+        })
             .then(response => {
                 if (response.status === 403) window.location = '/login';
                 return response;
@@ -573,7 +596,11 @@ document.addEventListener("DOMContentLoaded", function () {
             const headers = new Headers();
             headers.append('Authorization', apiToken);
 
-            fetch(postsUrl, {method: 'POST', body: formData, headers: headers})
+            fetch(postsUrl, {
+                method: 'POST',
+                body: formData,
+                headers: headers
+            })
                 .then(response => {
                     if (response.status === 403) window.location = '/login';
                     return response;
@@ -618,7 +645,11 @@ document.addEventListener("DOMContentLoaded", function () {
             const headers = new Headers();
             headers.append('Authorization', apiToken);
 
-            fetch(`${commentsUrl}/${postId}/comments`, {method: 'POST', body: formData, headers: headers})
+            fetch(`${commentsUrl}/${postId}/comments`, {
+                method: 'POST',
+                body: formData,
+                headers: headers
+            })
                 .then(response => {
                     if (response.status === 403) window.location = '/login';
                     return response;
@@ -632,5 +663,90 @@ document.addEventListener("DOMContentLoaded", function () {
 
         commentPublish.addEventListener('click', createHandler);
 
+    }
+
+    function searchFormListener(event) {
+        event.preventDefault();
+        postsPage = 1;
+        getPostsAndRender(searchInput.value);
+    }
+
+    function loadMoreButtonListener() {
+        postsPage++;
+        getPostsAndRender(searchInput.value);
+    }
+
+    function getPostsAndRender(q = null) {
+
+        const apiToken = localStorage.getItem('token');
+        const headers = new Headers();
+        headers.append('Authorization', apiToken);
+        let _postsUrl = postsUrl + `?`;
+        if (q) {
+            _postsUrl += `query=${q}&`;
+        }
+
+        _postsUrl += `page=${postsPage}`;
+
+        fetch(_postsUrl, {
+            method: 'GET',
+            headers: headers
+        })
+            .then(response => {
+                if (response.status === 403) window.location = '/login';
+                return response;
+            })
+            .then(response => response.json())
+            .then(response => {
+                checkIsEnd(response.isEnd);
+                actualPosts = response.posts;
+                renderPosts(actualPosts);
+                renderComments(actualPosts);
+                initListeners();
+            })
+            .catch(e => console.log(e));
+    }
+
+    function getUserDataAndRender() {
+        const apiToken = localStorage.getItem('token');
+        const currentUserId = localStorage.getItem('current_user_id');
+
+        const headers = new Headers();
+        headers.append('Authorization', apiToken);
+
+        fetch(`${userProfileUrl}/${currentUserId}`, {
+            method: 'GET',
+            headers: headers
+        })
+            .then(response => {
+                if (response.status === 403) window.location = '/login';
+                return response;
+            })
+            .then(response => response.json())
+            .then(response => {
+                let userProfile = response;
+                renderUserProfile(userProfile);
+            });
+    }
+
+    function checkIsEnd(isEnd) {
+        if (isEnd) {
+            loadMoreBox.classList.remove('show');
+            loadMoreBox.classList.add('hide');
+            goTopBox.classList.remove('hide');
+            goTopBox.classList.add('show');
+        } else {
+            loadMoreBox.classList.remove('hide');
+            loadMoreBox.classList.add('show');
+            goTopBox.classList.remove('show');
+            goTopBox.classList.add('hide');
+        }
+    }
+
+    function scrollTopAndRefresh() {
+        postsPage = 1;
+        searchInput.value = '';
+        getPostsAndRender();
+        document.documentElement.scrollTop = 0;
     }
 });
