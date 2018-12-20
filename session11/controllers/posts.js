@@ -23,7 +23,7 @@ module.exports.findPosts = async (req, res, next) => {
     //resObj.isEnd = (await PostModel.countDocuments(
     // {text: new RegExp(req.query.query, 'g')}) <= ( postsCfg.postsPerPage * req.query.page ) );
 
-    res.json(posts[0]);
+    res.json(...posts);
   } catch (err) {
     next(err);
   }

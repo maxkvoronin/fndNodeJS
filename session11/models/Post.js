@@ -30,7 +30,6 @@ postSchema.statics.getPost = function (id) {
 };
 
 postSchema.statics.getPosts = function (authUserId, page, searchTxt = '') {
-
   return this.aggregate([
       { $match: {
           text: { $regex: new RegExp(searchTxt) } } },
@@ -55,6 +54,7 @@ postSchema.statics.getPosts = function (authUserId, page, searchTxt = '') {
                 "foreignField": "post",
                 "as": "like" } },
             { $project: {
+                "author._id": "$author._id",
                 "author.firstName": "$author.firstName",
                 "author.lastName":  "$author.lastName",
                 "author.avatarUrl": "$author.avatarUrl",

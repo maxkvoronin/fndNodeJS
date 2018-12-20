@@ -63,7 +63,7 @@ module.exports.getUserProfile = async (req, res, next) => {
           commentsNumber: { $size: '$comments'},
       }}]);
 
-    res.json(profile[0]);
+    res.json(...profile);
   }
   catch (err) {
     next(err);

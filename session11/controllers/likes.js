@@ -2,11 +2,13 @@ const LikeModel = require('../models/Like');
 
 module.exports.setLikeOrDislike = async (req, res, next) => {
   try {
-    const like = await LikeModel.findOne({post: req.params.postId, author: req.user._id});
+    const cond = {post: req.params.postId, author: req.user._id};
+
+    const like = await LikeModel.findOne(cond);
     if (!like) {
-      await LikeModel.create({post: req.params.postId, author: req.user._id});
+      await LikeModel.create(cond);
     } else {
-      await LikeModel.deleteOne({post: req.params.postId, author: req.user._id});
+      await LikeModel.deleteOne(cond);
     }
 
     res.status(201).end();
